@@ -9,6 +9,10 @@ pub struct State {
 }
 
 impl State {
+    pub unsafe fn new_unchecked(state: u32) -> Self {
+        Self { state }
+    }
+
     #[cfg(not(feature = "std"))]
     pub fn new(state: u32) -> Option<Self> {
         if cfg!(target_feature = "pclmulqdq")

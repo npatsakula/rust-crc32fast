@@ -43,6 +43,31 @@ mod combine;
 mod specialized;
 mod table;
 
+pub struct SIMDHasher {
+    amount: u64,
+    state: specialized::State,
+}
+
+impl SIMDHasher {
+    /// # Safety
+    /// Check sse42 support by yourself.
+    pub unsafe fn new_unchecked(state: u32) -> Self {
+        Self {
+            amount: 0,
+            state: specialized::State::new_unchecked(state),
+        }
+    }
+
+    pub fn update(&mut self, data: &[u8]) {
+        self.amount += data.len() as u64;
+        self.state.update(data);
+    }
+
+    pub fn finalize(self) -> u32 {
+        self.state.finalize()
+    }
+}
+
 #[derive(Clone)]
 enum State {
     Baseline(baseline::State),
